@@ -3,6 +3,13 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
+  const apiKey = process.env.GEMINI_API_KEY;
+
+  if (!apiKey) {
+    console.error('GEMINI_API_KEY is not set');
+    return res.status(500).json({ reply: 'Server config error: API key missing.' });
+  }
+
   const { history } = req.body;
 
   if (!history || !Array.isArray(history)) {
@@ -10,8 +17,8 @@ export default async function handler(req, res) {
   }
 
   try {
-    const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${process.env.GEMINI_API_KEY}`,
+    const geminiRes = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`,
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -56,17 +63,13 @@ Instagram: https://www.instagram.com/jprizal.delrosario/
 == MEMBERSHIPS ==
 Philippine Society of IT Students
 
-== INTERESTS & GOALS ==
-Machine learning, responsive web design, Laravel back-end development, coding challenges, personal projects, emerging technologies.
-
 == AVAILABILITY ==
-Jp is open to collaboration, internship opportunities, and project work. Visitors can schedule a call via Calendly or email him directly.
+Jp is open to collaboration, internship opportunities, and project work.
 
 == TONE GUIDELINES ==
 - Be warm and approachable, like Jp himself
-- Use third person when referring to Jp (e.g. "Jp is currently..." or "He's working on...")
-- Never make up certifications, grades, awards, or experiences not listed above
-- If asked about certifications or recommendations, say those sections are being updated and invite the visitor to reach out directly`
+- Use third person when referring to Jp
+- Never make up certifications, grades, awards, or experiences not listed above`
             }]
           },
           contents: history
@@ -74,14 +77,20 @@ Jp is open to collaboration, internship opportunities, and project work. Visitor
       }
     );
 
-    const data = await response.json();
+    const data = await geminiRes.json();
+
+    if (!geminiRes.ok) {
+      console.error('Gemini API error:', JSON.stringify(data));
+      return res.status(500).json({ reply: `Gemini error: ${data?.error?.message || 'Unknown error'}` });
+    }
+
     const reply = data.candidates?.[0]?.content?.parts?.[0]?.text
       || "Sorry, I couldn't get a response right now.";
 
     res.status(200).json({ reply });
 
   } catch (err) {
-    console.error('Gemini error:', err);
-    res.status(500).json({ reply: "Oops! Something went wrong. Try emailing Jp directly at jprizal.gdelrosario@gmail.com" });
+    console.error('Handler error:', err.message);
+    res.status(500).json({ reply: `Error: ${err.message}` });
   }
 }
