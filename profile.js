@@ -12,8 +12,8 @@ function applyTheme(dark) {
     document.body.classList.remove('dark');
   }
   themeBtn.innerHTML = dark
-    ? '<img src="image/off.png" alt="Light mode" style="width:18px;height:18px;object-fit:contain;">'
-    : '<img src="image/on.png" alt="Dark mode" style="width:18px;height:18px;object-fit:contain;">';
+    ? '<img src="image/brightness.png" alt="Light mode" style="width:18px;height:18px;object-fit:contain;"> '
+    : '<img src="image/night-mode.png" alt="Dark mode" style="width:18px;height:18px;object-fit:contain;">';
 }
 
 const saved = localStorage.getItem('theme');
@@ -115,7 +115,7 @@ function showRec(i) {
 dots.forEach(d => d.addEventListener('click', () => showRec(+d.dataset.idx)));
 
 /* ════════════════════════════════════════
-   5 — AI CHAT WIDGET (Claude API via secure proxy)
+   5 — AI CHAT WIDGET (Gemini API - GitHub Pages)
 ════════════════════════════════════════ */
 const chatFab   = document.getElementById('chatFab');
 const chatPanel = document.getElementById('chatPanel');
@@ -123,6 +123,9 @@ const chatClose = document.getElementById('chatClose');
 const chatInput = document.getElementById('chatInput');
 const chatSend  = document.getElementById('chatSend');
 const chatMsgs  = document.getElementById('chatMessages');
+
+// ⚠️ Replace with your Gemini API key from aistudio.google.com
+const GEMINI_API_KEY = 'AIzaSyAJBYn2AMhUZZ0s_5goCn1m-mBxRkW8Kx4';
 
 const PORTFOLIO_CONTEXT = `You are an AI assistant embedded in Jp Rizal Del Rosario's personal portfolio website. You speak on Jp's behalf, answering visitor questions in a friendly, warm, and professional tone. Keep answers concise (2-4 sentences). Only use the facts below — never invent or assume details not listed here. If a visitor asks something not covered, say you are not sure and invite them to contact Jp directly via email.
 
@@ -204,25 +207,28 @@ async function sendMsg() {
 
   const typing = addBubble('...', 'from-me typing');
 
-  chatHistory.push({ role: 'user', content: text });
+  chatHistory.push({ role: 'user', parts: [{ text }] });
 
   try {
-    // Calls your secure Vercel serverless function — API key stays on the server
-    const res = await fetch('/api/chat', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        system: PORTFOLIO_CONTEXT,
-        messages: chatHistory
-      })
-    });
+    const response = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          system_instruction: { parts: [{ text: PORTFOLIO_CONTEXT }] },
+          contents: chatHistory
+        })
+      }
+    );
 
-    const data = await res.json();
-    const reply = data.content?.[0]?.text || "Sorry, I couldn't get a response right now.";
+    const data = await response.json();
+    const reply = data.candidates?.[0]?.content?.parts?.[0]?.text
+      || "Sorry, I couldn't get a response right now.";
 
     typing.remove();
     addBubble(reply, 'from-me');
-    chatHistory.push({ role: 'assistant', content: reply });
+    chatHistory.push({ role: 'model', parts: [{ text: reply }] });
 
   } catch (err) {
     typing.remove();

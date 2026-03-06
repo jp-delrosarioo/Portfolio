@@ -192,13 +192,11 @@ img { display: block; max-width: 100%; }
   padding: 10px;
   margin-bottom: 32px;
   border: 1px solid var(--border);
-  background-color: rgb(11, 10, 10);
 }
 .sec-all{
   border: 1px solid var(--border);
   padding: 10px;
   border-radius: 2px;
-  background-color: rgb(11, 10, 10);
 }
 .exp-all {
   border: 1px solid var(--border);
@@ -246,7 +244,6 @@ img { display: block; max-width: 100%; }
   border-radius: 2px;
   padding: 10px;
   border: 1px solid var(--border);
-  background-color: rgb(11, 10, 10);  
 }
 .stack-category { 
   margin-bottom: 14px;
@@ -376,7 +373,6 @@ img { display: block; max-width: 100%; }
   border: 1px solid var(--border);
   border-radius: 2px;
   padding: 10px;
-  background-color: rgb(11, 10, 10);
 }
 /* CERTS */
 .cert-list { display: flex; flex-direction: column; gap: 2px; }
@@ -407,7 +403,6 @@ img { display: block; max-width: 100%; }
   border: 1px solid var(--border);
   border-radius: 2px;
   padding: 10px;
-  background-color: rgb(11, 10, 10);
 }
 .rec-box {
   border: 1px solid var(--border);
@@ -451,7 +446,6 @@ img { display: block; max-width: 100%; }
   align-items: start;
   border: 1px solid var(--border);
   padding: 15px;
-  background-color: rgb(11, 10, 10);
   
 }
 .bottom-col-title {
@@ -493,7 +487,7 @@ img { display: block; max-width: 100%; }
   padding: 3px;
   border: 1px solid var(--border);
   border-bottom: 3px solid var(--border);
-  font-size: 13px;  
+  font-size: 13px;
   color: var(--muted);
   text-decoration: none;
   transition: color .2s;
