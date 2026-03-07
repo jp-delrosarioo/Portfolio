@@ -3,10 +3,10 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  const apiKey = process.env.GEMINI_API_KEY;
+  const apiKey = process.env.OPENAI_API_KEY;
 
   if (!apiKey) {
-    console.error('GEMINI_API_KEY is not set');
+    console.error('OPENAI_API_KEY is not set');
     return res.status(500).json({ reply: 'Server config error: API key missing.' });
   }
 
@@ -16,16 +16,11 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: 'Invalid request body' });
   }
 
-  try {
-    const geminiRes = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          system_instruction: {
-            parts: [{
-              text: `You are an AI assistant embedded in Jp Rizal Del Rosario's personal portfolio website. You speak on Jp's behalf, answering visitor questions in a friendly, warm, and professional tone. Keep answers concise (2-4 sentences). Only use the facts below — never invent or assume details not listed here. If a visitor asks something not covered, say you are not sure and invite them to contact Jp directly via email.
+  // Convert Gemini format to OpenAI format
+  const messages = [
+    {
+      role: 'system',
+      content: `You are an AI assistant embedded in Jp Rizal Del Rosario's personal portfolio website. You speak on Jp's behalf, answering visitor questions in a friendly, warm, and professional tone. Keep answers concise (2-4 sentences). Only use the facts below — never invent or assume details not listed here. If a visitor asks something not covered, say you are not sure and invite them to contact Jp directly via email.
 
 == ABOUT JP ==
 Full name: Jp Rizal Del Rosario
@@ -70,21 +65,35 @@ Jp is open to collaboration, internship opportunities, and project work.
 - Be warm and approachable, like Jp himself
 - Use third person when referring to Jp
 - Never make up certifications, grades, awards, or experiences not listed above`
-            }]
-          },
-          contents: history
-        })
-      }
-    );
+    },
+    ...history.map(msg => ({
+      role: msg.role === 'model' ? 'assistant' : 'user',
+      content: msg.parts[0].text
+    }))
+  ];
 
-    const data = await geminiRes.json();
+  try {
+    const openaiRes = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${apiKey}`
+      },
+      body: JSON.stringify({
+        model: 'gpt-3.5-turbo',
+        messages: messages,
+        max_tokens: 300
+      })
+    });
 
-    if (!geminiRes.ok) {
-      console.error('Gemini API error:', JSON.stringify(data));
-      return res.status(500).json({ reply: `Gemini error: ${data?.error?.message || 'Unknown error'}` });
+    const data = await openaiRes.json();
+
+    if (!openaiRes.ok) {
+      console.error('OpenAI error:', JSON.stringify(data));
+      return res.status(500).json({ reply: `OpenAI error: ${data?.error?.message || 'Unknown error'}` });
     }
 
-    const reply = data.candidates?.[0]?.content?.parts?.[0]?.text
+    const reply = data.choices?.[0]?.message?.content
       || "Sorry, I couldn't get a response right now.";
 
     res.status(200).json({ reply });
