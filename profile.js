@@ -115,7 +115,7 @@ function showRec(i) {
 dots.forEach(d => d.addEventListener('click', () => showRec(+d.dataset.idx)));
 
 /* ════════════════════════════════════════
-   5 — AI CHAT WIDGET (Gemini API - GitHub Pages)
+   5 — AI CHAT WIDGET
 ════════════════════════════════════════ */
 const chatFab   = document.getElementById('chatFab');
 const chatPanel = document.getElementById('chatPanel');
@@ -187,25 +187,28 @@ chatInput.addEventListener('keydown', e => {
 });
 
 /* ════════════════════════════════════════
-   6 — GALLERY ARROW SLIDER
+   6 — GALLERY ARROW SLIDER (null-safe)
 ════════════════════════════════════════ */
 const galleryStrip = document.getElementById('galleryStrip');
 const galleryPrev  = document.getElementById('galleryPrev');
 const galleryNext  = document.getElementById('galleryNext');
 
-function updateGalleryArrows() {
-  galleryPrev.disabled = galleryStrip.scrollLeft <= 0;
-  galleryNext.disabled = galleryStrip.scrollLeft + galleryStrip.clientWidth >= galleryStrip.scrollWidth - 1;
+// Only run if gallery elements actually exist in the HTML
+if (galleryStrip && galleryPrev && galleryNext) {
+  function updateGalleryArrows() {
+    galleryPrev.disabled = galleryStrip.scrollLeft <= 0;
+    galleryNext.disabled = galleryStrip.scrollLeft + galleryStrip.clientWidth >= galleryStrip.scrollWidth - 1;
+  }
+
+  galleryPrev.addEventListener('click', () => {
+    galleryStrip.scrollBy({ left: -220, behavior: 'smooth' });
+  });
+  galleryNext.addEventListener('click', () => {
+    galleryStrip.scrollBy({ left: 220, behavior: 'smooth' });
+  });
+
+  galleryStrip.addEventListener('scroll', updateGalleryArrows);
+  updateGalleryArrows();
 }
-
-galleryPrev.addEventListener('click', () => {
-  galleryStrip.scrollBy({ left: -220, behavior: 'smooth' });
-});
-galleryNext.addEventListener('click', () => {
-  galleryStrip.scrollBy({ left: 220, behavior: 'smooth' });
-});
-
-galleryStrip.addEventListener('scroll', updateGalleryArrows);
-updateGalleryArrows();
 
 }); // end DOMContentLoaded
