@@ -38,20 +38,20 @@ img { display: block; max-width: 100%; }
 .hero {
   display: grid;
   grid-template-columns: auto 1fr;
-  gap: 28px;
+  gap: 14px;
   margin-bottom: 48px;
   position: relative;
-  align-items: stretch;
+  align-items: start;
 }
 
-/* profile picture — height matches the info column naturally */
+/* profile picture — fixed square, never resizes, info column adjusts around it */
 .avatar {
-  width: 160px;
-  height: 100%;
-  min-height: 150px;
+  width: 150px;
+  height: 150px;
+  flex-shrink: 0;
   object-fit: cover;
   object-position: top center;
-  border-radius: 8px;
+  border-radius: 0px;
   display: block;
   border: 1px solid var(--border);
 }
@@ -812,7 +812,9 @@ footer {
   border: 1px solid var(--border);
   border-radius: 14px;
   padding: 24px;
-  width: 100%; max-width: 600px; max-height: 80vh;
+  width: 100%;
+  max-width: 600px; 
+  max-height: 80vh;
   overflow-y: auto;
   transform: translateY(8px);
   transition: transform .2s;
@@ -845,7 +847,8 @@ footer {
    transition: border-color .2s; 
   }
 .modal-x:hover { 
-  border-color: var(--dim); color: var(--text); 
+  border-color: var(--dim); 
+  color: var(--text); 
 }
 .modal-grid { 
   display: grid; 
@@ -883,31 +886,29 @@ footer {
   padding: 2px 6px; 
 }
 
-
 @media (max-width: 700px) {
   .page { padding: 24px 16px 80px; }
-
-  .hero { gap: 14px; margin-bottom: 32px; }
-  .avatar { width: 110px; min-height: 120px; }
-  .hero-name { font-size: 17px; padding-right: 70px; }
-  .hero-role { font-size: 12.5px; margin-bottom: 12px; }
-  .cta-btn { padding: 7px 11px; font-size: 11.5px; gap: 5px; }
-
+  .hero { gap: 12px; margin-bottom: 28px; }
+  .hero-name     { font-size: 18px; padding-right: 60px; }
+  .hero-location { font-size: 12px; }
+  .hero-role     { font-size: 12.5px; margin-bottom: 10px; }
+  .cta-row       { gap: 6px; }
+  .cta-btn       { padding: 6px 10px; font-size: 11.5px; gap: 5px; }
   .two-col,
   .cert-rec-row,
   .stack-projects-row { grid-template-columns: 1fr; }
-  .bottom-row { grid-template-columns: repeat(2, 1fr); }
-  .projects-grid { grid-template-columns: 1fr; }
+  .bottom-row         { grid-template-columns: repeat(2, 1fr); }
+  .projects-grid      { grid-template-columns: 1fr; }
 }
 
 @media (max-width: 480px) {
+  .page { padding: 16px 12px 80px; }
   .hero { gap: 10px; }
-  .avatar { width: 85px; min-height: 100px; }
-  .hero-name { font-size: 15px; padding-right: 60px; }
-  .hero-location { font-size: 12px; }
-  .hero-role { font-size: 12px; }
-  .cta-btn { padding: 6px 10px; font-size: 11px; }
+  .hero-name { font-size: 16px; padding-right: 52px; }
+  .hero-location { font-size: 11.5px; }
+  .hero-role { font-size: 11.5px; }
+  .cta-btn { padding: 5px 9px; font-size: 11px; }
   .bottom-row { grid-template-columns: 1fr; }
   .chat-panel { width: calc(100vw - 32px); right: 16px; }
-  .chat-fab {right: 16px; bottom: 16px; font-size: 12px; padding: 8px 14px; }
+  .chat-fab   { right: 16px; bottom: 16px; font-size: 12px; padding: 8px 14px; }
 }
